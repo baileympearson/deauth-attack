@@ -3,7 +3,7 @@
 ## Usage
 Must be run as sudo.
 ```
-	sudo python2 deauth.py
+sudo python2 deauth.py
 ```
 
 ## Dependencies 
@@ -24,3 +24,7 @@ monitor mode for your own device.
 	- add user interface and network selection
 
 
+## Liscense
+This software is for educational purposes only.  This software must always be
+used in a controlled environment and must never target a network not owned by
+user.  Any use other than as specified is prohibited.
