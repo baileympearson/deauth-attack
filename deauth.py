@@ -25,12 +25,8 @@ with scanner as s:
     network = raw_input("select network: ")
     networks = [s.networks.keys()[int(network) - 1]]
 
-    networks = s.networks.keys()
-
     attacker.updateQueue(networks)
-
-    time.sleep(45)
-    exit()
+    time.sleep(15)
 
     networks = [s.networks.keys()[int(network) - 1], WIFI]
     attacker.updateQueue(networks)
