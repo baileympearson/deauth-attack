@@ -68,6 +68,7 @@ def refresh():
 
 # exit the program
 def selfdestruct():
+    attack.stopAttack()
     sys.exit(0)    
 
 # change menu to the next page
@@ -93,22 +94,19 @@ def toggle_network(address):
     else:
         targets.append(address)
 
-    attack.stopAttack()
     attack.updateQueue(targets)
-    attack.startAttack()
     
 
 # networks currently being disabled
 targets = []
 
-# to attack networks
-iface = None
-attack = attacker.Attacker(iface)
-
 # to scan for networks
 scan = scanner.Scanner()
-scan.loadConfig()
 scan.scanNetworks()
+
+# to attack networks
+iface = scan.monitor_iface
+attack = attacker.Attacker(iface)
 
 # 'graphical' interface setup
 mh = menuHandler()
