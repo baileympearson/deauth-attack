@@ -2,6 +2,13 @@
 
 import subprocess
 
+####################################################
+#
+#   methods to enable and disable monitor
+#       mode for the wifi card (if possible)
+#
+####################################################
+
 def disableInterface(interface):
     airmon = subprocess.Popen(['airmon-ng','stop',interface],stdout=subprocess.PIPE)
     grep_mode = subprocess.Popen(['grep','mode'],stdin=airmon.stdout,stdout=subprocess.PIPE)
@@ -17,7 +24,6 @@ def disableInterface(interface):
     if out == "":
         return True
     return False
-
 
 def enableInterface(interface):
     airmon = subprocess.Popen(['airmon-ng','start',interface],stdout=subprocess.PIPE)
