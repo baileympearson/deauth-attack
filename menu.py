@@ -5,6 +5,8 @@ from consolemenu.items import *
 import threading
 import sys
 
+import scanner
+
 
 class menuHandler:
     sub_menu_size = 10
@@ -44,7 +46,7 @@ class menuHandler:
             menu.append_item(FunctionItem('Next Page', next_page))
 
         # all menus should be able to refresh or exit
-        menu.append_item(FunctionItem('Refresh', change_menu))
+        menu.append_item(FunctionItem('Refresh', refresh))
         menu.append_item(FunctionItem('Exit', selfdestruct))
 
         return menu
@@ -55,10 +57,8 @@ class menuHandler:
     def prev(self):
         self.cur_menu_index -= 1
 
-def change_menu():
+def refresh():
     time.sleep(1)
-    menu2 = menu_from_dict('Choose a Network to Disable', '', {'network1': '55:55:55:55:55', 'network3': '1:1:1:1:1', 'network4': '4:3:2:1:0'})
-    menu2.show()
     sys.exit(0)
 
 def selfdestruct():
@@ -81,8 +81,11 @@ def previous_page():
 def disable_network():
     pass
 
-sample = {str(i) for i in range(30)}
+scan = scanner.Scanner()
+scan.loadConfig()
+scan.scanNetworks()
+
 mh = menuHandler()
-mh.load_menus(sample)
+mh.load_menus(scan.getNetworks())
 menu = mh.generate_current_menu()
 menu.show()
