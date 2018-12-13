@@ -5,6 +5,7 @@ from consolemenu.items import *
 import threading
 import sys
 
+import attacker
 import scanner
 
 
@@ -35,7 +36,7 @@ class menuHandler:
         
         # load in actual menu contents
         for val in self.menu_list[self.cur_menu_index]:
-            menu.append_item(FunctionItem(val, disable_network))
+            menu.append_item(FunctionItem(val, toggle_network, args=[val]))
 
         # all menus except first should have back option
         if self.cur_menu_index != 0:
@@ -59,11 +60,17 @@ class menuHandler:
 
 def refresh():
     time.sleep(1)
+    scan.scanNetworks()
+    mh.load_menus(scan.getNetworks())
+    active_menu = mh.generate_current_menu()
+    active_menu.show()
     sys.exit(0)
 
+# exit the program
 def selfdestruct():
     sys.exit(0)    
 
+# change menu to the next page
 def next_page():
     time.sleep(1)
     mh.next()
@@ -71,6 +78,7 @@ def next_page():
     active_menu.show()
     sys.exit(0)
 
+# change menu to the previous page
 def previous_page():
     time.sleep(1)
     mh.prev()
@@ -78,13 +86,31 @@ def previous_page():
     active_menu.show()
     sys.exit(0)
 
-def disable_network():
-    pass
+# toggle whether the given network @ address is accessable or not
+def toggle_network(address):
+    if address in targets:
+        targets.remove(address)
+    else:
+        targets.append(address)
 
+    attack.stopAttack()
+    attack.updateQueue(targets)
+    attack.startAttack()
+    
+
+# networks currently being disabled
+targets = []
+
+# to attack networks
+iface = None
+attack = attacker.Attacker(iface)
+
+# to scan for networks
 scan = scanner.Scanner()
 scan.loadConfig()
 scan.scanNetworks()
 
+# 'graphical' interface setup
 mh = menuHandler()
 mh.load_menus(scan.getNetworks())
 menu = mh.generate_current_menu()
