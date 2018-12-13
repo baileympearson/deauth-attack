@@ -101,15 +101,18 @@ def toggle_network(address):
 targets = []
 
 # to scan for networks
-scan = scanner.Scanner()
-scan.scanNetworks()
+scanr = scanner.Scanner()
 
-# to attack networks
-iface = scan.monitor_iface
-attack = attacker.Attacker(iface)
+with scanr as scan: 
+    scan.scanNetworks()
 
-# 'graphical' interface setup
-mh = menuHandler()
-mh.load_menus(scan.getNetworks())
-menu = mh.generate_current_menu()
-menu.show()
+    # to attack networks
+    iface = scan.monitor_iface
+    attack = attacker.Attacker(iface)
+    attack.startAttack()
+
+    # 'graphical' interface setup
+    mh = menuHandler()
+    mh.load_menus(scan.getNetworks())
+    menu = mh.generate_current_menu()
+    menu.show()
